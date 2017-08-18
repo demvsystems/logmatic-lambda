@@ -1,11 +1,11 @@
-# logmatic-lambda
-*Link to the Logmatic.io documentation: http://doc.logmatic.io/docs/aws-lambda-s3*
+# logstash-lambda
+*Based on the logmatic-lambda function from Logmatic.io: https://github.com/logmatic/logmatic-lambda*
 
-AWS lambda function to ship ELB, S3, CloudTrail, VPC, CloudFront and CloudWatch logs to Logmatic.io
+AWS lambda function to ship ELB, S3, CloudTrail, VPC, CloudFront and CloudWatch logs to Logstash via TCP input plugin
 
 # Features
 
-- Use AWS Lambda to re-route triggered S3 events to Logmatic.io
+- Use AWS Lambda to re-route triggered S3 events to Logstash via TCP socket
 - ELB, S3, CloudTrail, VPC and CloudFont logs can be forwarded
 - SSL Security
 - JSON events providing details about S3 documents forwarded
@@ -39,7 +39,7 @@ Let's configure it now.
 
 - Give the function name you want
 - Set the Python 2.7 runtime and:
-  -  Copy-paste the [content](https://github.com/logmatic/logmatic-lambda/blob/master/lambda_function.py) of the `lambda_function.py` file in the Python editor of the AWS Lambda interface.
+  -  Copy-paste the [content](https://github.com/jrbeilke/logstash-lambda/blob/master/lambda_function.py) of the `lambda_function.py` file in the Python editor of the AWS Lambda interface.
 
 ### Parameters
 
@@ -47,13 +47,13 @@ At the top of the script you'll find a section called `#Parameters`, that's wher
 
 ```
 #Parameters
-logmaticKey = "<your_api_key>"
+host = "<your_logstash_hostname>"
 metadata = {"context":{"foo": "bar"}}
 ```
 
-- **API key**:
+- **host**:
 
-Replace `<your_api_key>`: The Logmatic.io's API key is available your platform.
+Replace `<your_logstash_hostname>` with the hostname for your Logstash server.
 
 - **metadata**:
 

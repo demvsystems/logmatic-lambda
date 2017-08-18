@@ -10,7 +10,7 @@ import re
 import zlib
 
 # Parameters
-logmaticKey = "<your_api_key>"
+host = "<your_logstash_hostname>"
 metadata = {
     "your_metafields": {
         "backend": "python"
@@ -19,7 +19,6 @@ metadata = {
 }
 
 # Constants
-host = "api.logmatic.io"
 raw_port = 10514
 
 # SSL security
@@ -30,11 +29,11 @@ ssl_port = 10515
 
 def lambda_handler(event, context):
     # Check prerequisites
-    if logmaticKey == "<your_api_key>" or logmaticKey == "":
+    if host == "<your_logstash_hostname>" or host == "":
         raise Exception(
-                "You must configure your API key before starting this lambda function (see #Parameters section)")
+                "You must configure your Logstash hostname before starting this lambda function (see #Parameters section)")
 
-    # Attach Logmatic.io's Socket
+    # Attach Logstash TCP Socket
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     port = raw_port
@@ -113,7 +112,7 @@ def s3_handler(s, event):
             structured_line = merge_dicts(event, {"aws": {"s3": {"bucket": bucket, "key": key}}})
             structured_logs.append(structured_line)
     else:
-        # Send lines to Logmatic.io
+        # Send lines to Logstash
         for line in data.splitlines():
             # Create structured object
             structured_line = {"aws": {"s3": {"bucket": bucket, "key": key}}, "message": line}
@@ -130,7 +129,7 @@ def awslogs_handler(s, event):
 
     structured_logs = []
 
-    # Send lines to Logmatic.io
+    # Send lines to Logstash
     for log in logs["logEvents"]:
         # Create structured object and send it
         structured_line = merge_dicts(log, {
@@ -158,9 +157,9 @@ def send_entry(s, log_entry):
     # Merge with metadata
     log_entry = merge_dicts(log_entry, metadata)
 
-    # Send to Logmatic.io
+    # Send to Logstash
     str_entry = json.dumps(log_entry)
-    s.send((logmaticKey + " " + str_entry + "\n").encode("UTF-8"))
+    s.send((str_entry + "\n").encode("UTF-8"))
 
 
 def merge_dicts(a, b, path=None):
